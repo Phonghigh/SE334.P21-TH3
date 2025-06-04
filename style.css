@@ -1,0 +1,53 @@
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 20px;
+    margin: 0;
+}
+
+.container {
+    max-width: 500px;
+    width: 100%;
+}
+
+.player {
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.player h5 {
+    color: #333;
+}
+
+.controls button {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.progress-container input[type="range"],
+.volume-container input[type="range"] {
+    cursor: pointer;
+}
+
+.playlist {
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.playlist h5 {
+    color: #333;
+}
+
+.list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item.playing {
+    background-color: #007bff;
+    color: white;
+} 
