@@ -6,70 +6,146 @@
     <title>Music Player</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="player card shadow">
-            <div class="card-body">
-                <h5 class="card-title text-center" id="current-song">No Song Playing</h5>
-                <audio id="audio-player" class="w-100"></audio>
-
-                <div class="controls text-center my-3">
-                    <button id="prev-btn" class="btn btn-secondary mx-1">Prev</button>
-                    <button id="play-pause-btn" class="btn btn-primary mx-1">Play</button>
-                    <button id="next-btn" class="btn btn-secondary mx-1">Next</button>
-                </div>
-
-                <div class="progress-container my-3">
-                    <input type="range" id="progress-bar" class="form-range" value="0" min="0" max="100">
-                </div>
-
-                <div class="volume-container my-3 d-flex align-items-center">
-                    <label for="volume-bar" class="form-label me-2">Volume:</label>
-                    <input type="range" id="volume-bar" class="form-range w-auto flex-grow-1" value="1" min="0" max="1" step="0.01">
-                </div>
-
-                <hr>
-
-                <div class="advanced-controls text-center my-3">
-                    <h6>Advanced</h6>
-                    <div class="seek-controls my-2">
-                        <button id="seek-backward-btn" class="btn btn-outline-secondary btn-sm mx-1">-10s</button>
-                        <button id="seek-forward-btn" class="btn btn-outline-secondary btn-sm mx-1">+10s</button>
-                    </div>
-                    <div class="sleep-timer-controls my-2">
-                        <div class="input-group input-group-sm mb-2">
-                            <input type="number" id="sleep-timer-input" class="form-control" placeholder="Mins" min="1">
-                            <button id="set-sleep-timer-btn" class="btn btn-outline-primary">Set Sleep Timer</button>
-                        </div>
-                        <button id="cancel-sleep-timer-btn" class="btn btn-outline-danger btn-sm" style="display:none;">Cancel Timer</button>
-                        <div id="sleep-timer-status" class="form-text mt-1"></div>
-                    </div>
-                </div>
-
+    <div class="spotify-app d-flex">
+        <!-- Sidebar -->
+        <nav class="sidebar d-flex flex-column align-items-start p-3">
+            <div class="sidebar-logo mb-4">
+                <span class="logo-circle">🎵</span>
+                <span class="logo-text ms-2">MySpotify</span>
             </div>
-        </div>
+            <ul class="nav flex-column w-100">
+                <li class="nav-item w-100 mb-2">
+                    <a href="#" class="nav-link active" id="menu-player">
+                        <span class="me-2">🎧</span> Nghe nhạc
+                    </a>
+                </li>
+                <li class="nav-item w-100">
+                    <a href="#" class="nav-link" id="menu-add">
+                        <span class="me-2">➕</span> Thêm nhạc
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-        <div class="playlist mt-4 card shadow">
-            <div class="card-body">
-                <h5 class="card-title">Playlist</h5>
-                <ul id="playlist-ul" class="list-group mb-3">
-                    <!-- Songs will be listed here by JavaScript -->
-                </ul>
-                <div id="playlist-management">
-                    <h6 class="mt-3">Add New Song</h6>
-                    <div class="mb-2">
-                        <input type="text" id="song-name-input" class="form-control" placeholder="Song Name">
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1 p-4 position-relative">
+            <!-- Theme toggle button top right -->
+            <button id="toggle-theme-btn" class="btn btn-outline-light theme-toggle-btn">
+                <span id="theme-icon">🌙</span> <span id="theme-label">Dark Mode</span>
+            </button>
+            <!-- Music Player View -->
+            <div id="player-view">
+                <div class="container">
+                    <div class="player card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title text-center" id="current-song">No Song Playing</h5>
+                            <audio id="audio-player" class="w-100"></audio>
+
+                            <div class="controls text-center my-3">
+                                <button id="prev-btn" class="btn btn-secondary mx-1">⏮ Prev</button>
+                                <button id="play-pause-btn" class="btn btn-primary mx-1">⏯ Play</button>
+                                <button id="next-btn" class="btn btn-secondary mx-1">Next ⏭</button>
+                            </div>
+
+                            <canvas id="visualizer" height="60" style="width:100%;display:block;background:transparent;margin-bottom:10px;"></canvas>
+
+                            <div class="progress-container my-3">
+                                <input type="range" id="progress-bar" class="form-range" value="0" min="0" max="100">
+                            </div>
+                            <div id="lyrics-display" class="lyrics-display mt-3"></div>
+
+                            <div class="volume-container my-3 d-flex align-items-center">
+                                <label for="volume-bar" class="form-label me-2">Volume:</label>
+                                <input type="range" id="volume-bar" class="form-range w-auto flex-grow-1" value="1" min="0" max="1" step="0.01">
+                            </div>
+
+                            <hr>
+
+                            <div class="advanced-controls text-center my-3">
+                                <h6>Advanced</h6>
+                                <div class="seek-controls my-2">
+                                    <button id="seek-backward-btn" class="btn btn-outline-secondary btn-sm mx-1">⏪ -10s</button>
+                                    <button id="seek-forward-btn" class="btn btn-outline-secondary btn-sm mx-1">+10s ⏩</button>
+                                </div>
+                                <div class="sleep-timer-controls my-2">
+                                    <div class="input-group input-group-sm mb-2">
+                                        <span class="input-group-text">⏰</span>
+                                        <input type="number" id="sleep-timer-input" class="form-control" placeholder="Mins" min="1">
+                                        <button id="set-sleep-timer-btn" class="btn btn-outline-primary">Set Sleep Timer</button>
+                                    </div>
+                                    <button id="cancel-sleep-timer-btn" class="btn btn-outline-danger btn-sm" style="display:none;">❌ Cancel Timer</button>
+                                    <div id="sleep-timer-status" class="form-text mt-1"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-2">
-                        <input type="text" id="song-path-input" class="form-control" placeholder="Song Path (e.g., music/song.mp3 or URL)">
+
+                    <div class="playlist mt-4 card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Playlist</h5>
+                            <ul id="playlist-ul" class="list-group mb-3">
+                                <!-- Songs will be listed here by JavaScript -->
+                            </ul>
+                        </div>
                     </div>
-                    <button id="add-song-btn" class="btn btn-success btn-sm">Add Song to Playlist</button>
+                </div>
+            </div>
+
+            <!-- Add Music View (hidden by default) -->
+            <div id="add-music-view" style="display:none;">
+                <div class="container">
+                    <div class="add-music card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Thêm nhạc mới</h5>
+                            <div id="playlist-management">
+                                <div class="add-song-method mb-3">
+                                    <label for="song-name-input" class="form-label">Tên bài hát (tùy chọn cho file upload)</label>
+                                    <input type="text" id="song-name-input" class="form-control mb-2" placeholder="Nhập tên bài hát">
+                                    <label for="song-file-input" class="form-label">Tải lên file nhạc:</label>
+                                    <input type="file" id="song-file-input" class="form-control" accept="audio/*">
+                                    <div class="text-center my-2 fw-bold">HOẶC</div>
+                                    <label for="song-path-input" class="form-label">Nhập URL bài hát:</label>
+                                    <input type="text" id="song-path-input" class="form-control" placeholder="Ví dụ: http://example.com/song.mp3">
+                                    <label for="lyrics-input" class="form-label mt-2">Lời bài hát (Lyrics, có thể có timestamp dạng [mm:ss])</label>
+                                    <textarea id="lyrics-input" class="form-control" rows="4" placeholder="[00:10] Đoạn 1\n[00:25] Đoạn 2 hoặc chỉ nhập lời thường..."></textarea>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button id="add-song-btn" class="btn btn-success">➕ Thêm vào Playlist</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        // Sidebar menu switching logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuPlayer = document.getElementById('menu-player');
+            const menuAdd = document.getElementById('menu-add');
+            const playerView = document.getElementById('player-view');
+            const addMusicView = document.getElementById('add-music-view');
 
+            menuPlayer.addEventListener('click', function(e) {
+                e.preventDefault();
+                menuPlayer.classList.add('active');
+                menuAdd.classList.remove('active');
+                playerView.style.display = '';
+                addMusicView.style.display = 'none';
+            });
+            menuAdd.addEventListener('click', function(e) {
+                e.preventDefault();
+                menuAdd.classList.add('active');
+                menuPlayer.classList.remove('active');
+                playerView.style.display = 'none';
+                addMusicView.style.display = '';
+            });
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html> 
